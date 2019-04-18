@@ -2,44 +2,120 @@
 <html>
 <head>
 	<title>Hello</title>
+	<meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 </head>
 <body>
-	<span>Hello click this button</span>
-<!-- 	<input class="cool__input" value="text"></input>
-	<button class="cool__button"></button> -->
+	<div class="container">
+		<span>Hello this is cool chat</span>
 
-	<form name="publish">
-	  <input type="text" name="message" value="Hello">
-	  <input type="submit" value="Отправить">
-	</form>
+		<!-- здесь будут появляться входящие сообщения -->
+		<div class="dialog"></div>
 
-	<!-- здесь будут появляться входящие сообщения -->
-	<div id="subscribe"></div>
+		<form name="publish">
+		  <textarea type="text" name="message" placeholder="Enter you message here"></textarea> 
+		  <input type="submit" value="Отправить">
+		</form>
+	</div>
 
 	<script type="text/javascript">
 		// создать подключение
-		var socket = new WebSocket("ws://localhost:8081");
+		const socket = new WebSocket("ws://localhost:8081");
 
 		// отправить сообщение из формы publish
 		document.forms.publish.onsubmit = function() {
-		  var outgoingMessage = this.message.value;
+		  let outgoingMessage = this.message.value;
 
 		  socket.send(outgoingMessage);
+		  this.message.value = ""; //clear textarea after submit 
 		  return false;
 		};
 
 		// обработчик входящих сообщений
 		socket.onmessage = function(event) {
-		  var incomingMessage = event.data;
+		  let incomingMessage = event.data;
+		  //console.log(event.data)
 		  showMessage(incomingMessage);
 		};
 
-		// показать сообщение в div#subscribe
+
+		/*socket.onclose = function(event) {
+		  let oncloseMessage = event.data;
+		  console.log(event.data)
+		  showMessage(oncloseMessage);
+		};*/
+
+
+
+		// показать сообщение в .dialog
 		function showMessage(message) {
-		  var messageElem = document.createElement('div');
+		  let messageElem = document.createElement('div');
 		  messageElem.appendChild(document.createTextNode(message));
-		  document.getElementById('subscribe').appendChild(messageElem);
+		  document.querySelector('.dialog').appendChild(messageElem);
 		}
 	</script>
+	<style type="text/css">
+		body{
+			margin: 0;
+			padding: 0;
+			font-family: monospace;
+		}
+		.container{
+			display: block;
+			max-width: 600px;
+			margin: 0 auto;
+			padding-top: 30px;
+		}
+		form{
+			display: flex;
+			box-sizing: border-box;
+		}
+		textarea{
+			outline: 0;
+		    min-height: 100px;
+		    width: 100%;
+		    resize: none;
+		    max-height: 200px;
+		    overflow-y: auto;
+		    overflow-x: hidden;
+		    border-radius: 6px;
+		    line-height: 17px;
+		    padding: 9px 30px 10px 13px;
+		    margin-bottom: 0;
+		    word-wrap: break-word;
+		    box-sizing: border-box;
+		    border: 1px solid #e6e6e6;
+
+		    font-family: monospace;
+		}
+		input{
+			background-color: transparent;
+			box-sizing: border-box;
+			border-radius: 6px;
+			margin-left: 30px;
+			border: 1px solid #e6e6e6;
+
+			font-family: monospace;
+		}
+		.dialog{
+			width: 100%;
+			margin-top: 30px;
+			margin-bottom: 30px;
+		}
+		.dialog > div{
+			padding: 10px;
+			border: 1px solid #e6e6e6;
+			border-radius: 6px;
+			margin-bottom: 15px;
+		}
+		@media screen and  (max-width: 600px){
+			.container{
+				max-width: 400px;
+				margin: 0 3vw;
+			}
+		}
+	</style>
 </body>
 </html>
