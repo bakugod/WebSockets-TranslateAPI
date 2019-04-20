@@ -16,11 +16,16 @@
 
 		<form name="publish">
 		  <textarea type="text" name="message" placeholder="Enter you message here"></textarea> 
-		  <input type="submit" value="Отправить">
+		  <input type="submit" value="Send">
 		</form>
 	</div>
 
 	<script type="text/javascript">
+
+		function GetDate(){
+			return new Date().toJSON().slice(11,19);
+		}
+		console.log(GetDate())
 		// создать подключение
 		const socket = new WebSocket("ws://localhost:8081");
 
@@ -41,20 +46,39 @@
 		};
 
 
-		/*socket.onclose = function(event) {
-		  let oncloseMessage = event.data;
-		  console.log(event.data)
-		  showMessage(oncloseMessage);
-		};*/
+		socket.onclose = function(event) {
+		  //let oncloseMessage = event.data;
+		  console.log(event)
+		  //localStorage.setItem('oncloseMessage', event);
+		  showMessage(`Соединение разорвано`);
+		};
 
 
-
+		
+		let htmlcol = [];
 		// показать сообщение в .dialog
 		function showMessage(message) {
 		  let messageElem = document.createElement('div');
-		  messageElem.appendChild(document.createTextNode(message));
+
+		  messageElem.appendChild(document.createTextNode(message + ` в ${GetDate()}`));
 		  document.querySelector('.dialog').appendChild(messageElem);
+
+		  // Save messages to local storage without Date
+		  htmlcol.push(message);
+		  localStorage.setItem("message", JSON.stringify(htmlcol));
 		}
+
+		// Add last session messages to our dialog 
+		function defaulView(){
+			let saved = JSON.parse(localStorage.getItem(`message`));
+			console.log(saved)
+			saved.forEach((elem) => {
+				let messageElem = document.createElement('div');
+				messageElem.appendChild(document.createTextNode(elem))
+				document.querySelector('.dialog').appendChild(messageElem)
+			});
+		};defaulView();
+
 	</script>
 	<style type="text/css">
 		body{
@@ -93,6 +117,7 @@
 		input{
 			background-color: transparent;
 			box-sizing: border-box;
+			min-width: 15%;
 			border-radius: 6px;
 			margin-left: 30px;
 			border: 1px solid #e6e6e6;
@@ -114,6 +139,9 @@
 			.container{
 				max-width: 400px;
 				margin: 0 3vw;
+			}
+			input{
+				min-width: 25%;
 			}
 		}
 	</style>
